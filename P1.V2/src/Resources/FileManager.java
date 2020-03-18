@@ -18,9 +18,9 @@ public class FileManager {
 	private LinkedList<Ballot> ballotList;
 	private LinkedList<Candidate> candidateList;
 	
-	private int totalBallots;
-	private int totalBlankBallots;
-	private int totalInvalidBallots;
+	private int totalBallots = 0;
+	private int totalBlankBallots = 0;
+	private int totalInvalidBallots = 0;
 	
 	public FileManager() {
 		
@@ -34,6 +34,8 @@ public class FileManager {
 		ballotBuilder(ballotDocument);
 		candidateBuilder(candidateDocument);
 		printBallotIDs(getBallotList());
+		System.out.println(totalBallots);
+		System.out.println(totalBlankBallots);
 	}
 	
 
@@ -43,13 +45,13 @@ public class FileManager {
 		String editor;
 		Ballot ballot;
 		while(sc.hasNextLine()) {
+			totalBallots++;
 			editor = sc.nextLine();
 			if(editor.indexOf(",") > 0) {
 				ballot = new Ballot(findBallotID(editor),buildCastedVotesList(editor.substring(editor.indexOf(",") + 1)));
 				ballotList.add(ballot);
 			}else {
-				ballot = new Ballot(findBallotID(editor), new LinkedList<CastedVotes>());
-				ballotList.add(ballot);
+				totalBlankBallots++;
 			}
 		}
 		

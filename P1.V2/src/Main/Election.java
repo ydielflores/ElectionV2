@@ -9,7 +9,7 @@ public class Election {
 	
 	public static void main(String[] args) throws FileNotFoundException {
 		// TODO Auto-generated method stub
-		fileManager.start(fileManager.ballots, fileManager.candidates);
+		fileManager.start(fileManager.ballots2, fileManager.candidates);
 	}
 
 }
