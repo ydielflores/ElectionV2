@@ -7,8 +7,14 @@ import java.util.Scanner;
 import Ballot.Ballot;
 import Ballot.Candidate;
 import Ballot.CastedVotes;
+import Ballot.Regroup;
 import DataStructures.LinkedList.LinkedList;
-
+/**
+ * 
+ * @author Ydiel Zaid Flores Torres
+ *
+ * This class is responsible for loading, reading and decomposing the files.
+ */
 public class FileManager {
 	
 	public File ballots;
@@ -33,6 +39,7 @@ public class FileManager {
 	public void start(File ballotDocument, File candidateDocument) throws FileNotFoundException {
 		ballotBuilder(ballotDocument);
 		candidateBuilder(candidateDocument);
+		
 		printBallotIDs(getBallotList());
 		System.out.println(totalBallots);
 		System.out.println(totalBlankBallots);
@@ -62,31 +69,79 @@ public class FileManager {
 		return toInt.intValue();
 	}
 	private LinkedList<CastedVotes> buildCastedVotesList(String s){
-		System.out.println("Wait until implemented");
-		return null;
+		LinkedList<CastedVotes> castedVotesList = new LinkedList<CastedVotes>();
+		CastedVotes castedVotes;
+		
+		int candidateID;
+		int rank;
+		Integer toInt;
+		
+		String editorID;
+		String editorRank;
+		while(s.length()>0) {
+			editorID = s;
+			editorRank = s;
+			toInt = new Integer(editorID.substring(0, 1));
+			candidateID = toInt.intValue();
+			toInt = new Integer (editorRank.substring(2,3));
+			rank = toInt.intValue();
+			castedVotes = new CastedVotes(candidateID, rank);
+			castedVotesList.add(castedVotes);
+			s = s.substring(s.indexOf(",") + 1);
+			if(s.indexOf(",") < 0) {
+				editorID = s;
+				editorRank = s;
+				toInt = new Integer(editorID.substring(0, 1));
+				candidateID = toInt.intValue();
+				toInt = new Integer (editorRank.substring(2,3));
+				rank = toInt.intValue();
+				castedVotes = new CastedVotes(candidateID, rank);
+				castedVotesList.add(castedVotes);
+				break;
+			}
+		}
+		
+		return castedVotesList;
 	}
 	
 	private void candidateBuilder(File candidateDocument) throws FileNotFoundException{
 		candidateList = new LinkedList<Candidate>();
+		
 		Scanner sc = new Scanner(candidateDocument);
-		String editor;
 		
-//		while(sc.hasNextLine()) {
-//			
-//		}
+		String editorName;
+		String editorID;
 		
+		Candidate candidate;
+		
+		Integer toInt;
+		int ID;
+		
+		while(sc.hasNextLine()) {
+			editorName = sc.nextLine();
+			editorID = editorName;
+			toInt = new Integer(editorID.substring(editorID.indexOf(",") +1));
+			ID = toInt.intValue();
+			candidate = new Candidate(editorName.substring(0, editorName.indexOf(",")), ID, new LinkedList<Regroup>());
+			candidateList.add(candidate);
+		}
+	
 		sc.close();
 	}
-	
+
 	private void printBallotIDs(LinkedList<Ballot> list) {
 		
-		System.out.println("BallotIDs");
 		for(Ballot b : list) {
 			System.out.println(b.getBallotID());
+			printCastedVotes(b.getCastedVotes());
 		}
 	}
 	
-	
+	private void printCastedVotes(LinkedList<CastedVotes> list) {
+		for(CastedVotes cv : list) {
+			System.out.println("ID : " + cv.getCandidateID() + " Rank : " + cv.getRank());
+		}
+	}
 	
 	
 	
