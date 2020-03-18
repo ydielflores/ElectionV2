@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.util.Scanner;
 
 import Ballot.Ballot;
+import Ballot.BallotValidation;
 import Ballot.Candidate;
 import Ballot.CastedVotes;
 import Ballot.Regroup;
@@ -24,6 +25,8 @@ public class FileManager {
 	private LinkedList<Ballot> ballotList;
 	private LinkedList<Candidate> candidateList;
 	
+	private BallotValidation ballotValidation = new BallotValidation();
+	
 	private int totalBallots = 0;
 	private int totalBlankBallots = 0;
 	private int totalInvalidBallots = 0;
@@ -39,10 +42,12 @@ public class FileManager {
 	public void start(File ballotDocument, File candidateDocument) throws FileNotFoundException {
 		ballotBuilder(ballotDocument);
 		candidateBuilder(candidateDocument);
-		
 		printBallotIDs(getBallotList());
+		ballotList = ballotValidation.validate(ballotList, candidateList);
+		totalInvalidBallots = ballotValidation.getInvalidBallots();
 		System.out.println(totalBallots);
 		System.out.println(totalBlankBallots);
+		System.out.println(totalInvalidBallots);
 	}
 	
 
