@@ -2,6 +2,12 @@ package Ballot;
 
 import DataStructures.LinkedList.LinkedList;
 
+/**
+ * BallotValidation class validates the ballots in a document. 
+ * 
+ * @author Ydiel Zaid Flores Torres
+ *
+ */
 public class BallotValidation {
 
 	private int invalidBallots = 0;
@@ -9,6 +15,13 @@ public class BallotValidation {
 
 
 	public BallotValidation() {	}
+	
+	/**
+	 * This method validates every ballot in the ballotList. 
+	 * @param ballotList
+	 * @param candidateList
+	 * @return ballotList - Returns the same ballotList as parameter but without the invalid ballots.
+	 */
 
 	public LinkedList<Ballot> validate(LinkedList<Ballot> ballotList, LinkedList<Candidate> candidateList){
 		validateDublicate(ballotList);
@@ -83,13 +96,19 @@ public class BallotValidation {
 		}
 	}
 
+	/**
+	 * This method removes the invalid ballots from the ballotList.
+	 * 
+	 * @param ballotList
+	 * @return ballotList - Return the ballot list without the invalid ballots.
+	 */
 	private LinkedList<Ballot> remove(LinkedList<Ballot> ballotList){
 
 		for(Ballot b : ballotsToDiscard) {
-			System.out.println(b.getBallotID());
 			ballotList.remove(b);
 			invalidBallots++;
 		}
+		ballotsToDiscard.clear();
 		return ballotList;
 	}
 	/**
@@ -104,6 +123,7 @@ public class BallotValidation {
 	}
 
 	/**
+	 * This method let's you access the amount of invalid ballots.
 	 * @return int - Represents the amount of invalid ballots.
 	 */
 	public int getInvalidBallots() {

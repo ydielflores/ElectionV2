@@ -42,14 +42,32 @@ public class FileManager {
 	public void start(File ballotDocument, File candidateDocument) throws FileNotFoundException {
 		ballotBuilder(ballotDocument);
 		candidateBuilder(candidateDocument);
-		printBallotIDs(getBallotList());
+		
 		ballotList = ballotValidation.validate(ballotList, candidateList);
 		totalInvalidBallots = ballotValidation.getInvalidBallots();
-		System.out.println(totalBallots);
-		System.out.println(totalBlankBallots);
-		System.out.println(totalInvalidBallots);
+		
+		fillCanidateVotesList(ballotList, candidateList);
+		printTheListOfVotes(candidateList);
+		
 	}
 	
+
+	private void fillCanidateVotesList(LinkedList<Ballot> ballotList, LinkedList<Candidate> candidateList) {
+		
+		Regroup regroup;
+		
+		for(Candidate c : candidateList) {
+			for(Ballot b : ballotList) {
+				for(CastedVotes cv : b.getCastedVotes()) {
+					if(c.getCandidateID() == cv.getCandidateID()) {
+						regroup = new Regroup(b.getBallotID(), cv.getRank());
+						c.getVotesReceived().add(regroup);
+					}
+				}
+			}
+		}
+		
+	}
 
 	private void ballotBuilder(File ballotDocument) throws FileNotFoundException{
 		ballotList = new LinkedList<Ballot>();
@@ -88,7 +106,7 @@ public class FileManager {
 			editorRank = s;
 			toInt = new Integer(editorID.substring(0, 1));
 			candidateID = toInt.intValue();
-			toInt = new Integer (editorRank.substring(2,3));
+			toInt = new Integer (editorRank.substring(editorRank.indexOf(":") + 1,editorRank.indexOf(",")));
 			rank = toInt.intValue();
 			castedVotes = new CastedVotes(candidateID, rank);
 			castedVotesList.add(castedVotes);
@@ -134,6 +152,14 @@ public class FileManager {
 		sc.close();
 	}
 
+	private void printTheListOfVotes(LinkedList<Candidate> list) {
+		for(Candidate c : list) {
+			System.out.println(c.getCandidateName() + " " + c.getCandidateID() + " Received:");
+			for(Regroup r : c.getVotesReceived()) {
+				System.out.println(r.getBallotID() + " " + r.getRank());
+			}
+		}
+	}
 	private void printBallotIDs(LinkedList<Ballot> list) {
 		
 		for(Ballot b : list) {
