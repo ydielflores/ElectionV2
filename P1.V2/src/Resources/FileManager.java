@@ -10,6 +10,7 @@ import Ballot.Candidate;
 import Ballot.CastedVotes;
 import Ballot.Regroup;
 import DataStructures.LinkedList.LinkedList;
+import Main.CountingProcess;
 /**
  * 
  * @author Ydiel Zaid Flores Torres
@@ -26,6 +27,7 @@ public class FileManager {
 	private LinkedList<Candidate> candidateList;
 	
 	private BallotValidation ballotValidation = new BallotValidation();
+	private CountingProcess countingProcess = new CountingProcess();
 	
 	private int totalBallots = 0;
 	private int totalBlankBallots = 0;
@@ -47,7 +49,8 @@ public class FileManager {
 		totalInvalidBallots = ballotValidation.getInvalidBallots();
 		
 		fillCanidateVotesList(ballotList, candidateList);
-		printTheListOfVotes(candidateList);
+		
+		countingProcess.startCountingProcess(getCandidateList(), getBallotList());
 		
 	}
 	
@@ -145,7 +148,7 @@ public class FileManager {
 			editorID = editorName;
 			toInt = new Integer(editorID.substring(editorID.indexOf(",") +1));
 			ID = toInt.intValue();
-			candidate = new Candidate(editorName.substring(0, editorName.indexOf(",")), ID, new LinkedList<Regroup>());
+			candidate = new Candidate(editorName.substring(0, editorName.indexOf(",")), ID, new LinkedList<Regroup>(),0);
 			candidateList.add(candidate);
 		}
 	

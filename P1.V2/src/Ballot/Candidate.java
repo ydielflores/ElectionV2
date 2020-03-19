@@ -7,13 +7,23 @@ public class Candidate {
 	private String candidateName;
 	private int candidateID;
 	private LinkedList<Regroup> votesReceived;
+	private int amountOfOnesAtElimination;
 	
-	public Candidate(String candidateName, int candidateID, LinkedList<Regroup> votesReceived) {
+	public Candidate(String candidateName, int candidateID, LinkedList<Regroup> votesReceived, int amountOfOnesAtElimination) {
 		this.candidateName = candidateName;
 		this.candidateID = candidateID;
 		this.votesReceived = votesReceived;
+		this.amountOfOnesAtElimination = amountOfOnesAtElimination;
 	}
 	
+	public int getAmountOfOnesAtElimination() {
+		return amountOfOnesAtElimination;
+	}
+
+	public void setAmountOfOnesAtElimination(int amountOfOnesAtElimination) {
+		this.amountOfOnesAtElimination = amountOfOnesAtElimination;
+	}
+
 	public int getAmountOf(int rank) {
 		int count = 0;
 		for(Regroup r : getVotesReceived()) {
