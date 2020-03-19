@@ -1,24 +1,39 @@
 package Main;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PipedWriter;
+import java.io.PrintWriter;
+
 import Ballot.Ballot;
 import Ballot.Candidate;
 import Ballot.Regroup;
 import DataStructures.LinkedList.LinkedList;
+import Resources.FileManager;
 
 public class CountingProcess {
-
+	FileManager fm = new FileManager();
 	private LinkedList<Candidate> eliminatedList = new LinkedList<Candidate>();
 	private LinkedList<Candidate> tieList = new LinkedList<Candidate>();
-
 	private Candidate winner;
-
 	public CountingProcess() {}
 
-	public void startCountingProcess(LinkedList<Candidate> candidateList, LinkedList<Ballot> ballotList) {
-		boolean bananaaaaaaaaasssssss = true;
+	/**
+	 * This method starts the counting process.
+	 * @param candidateList
+	 * @param ballotList
+	 * @param totalBallots
+	 * @param blankBallots
+	 * @param invalidBallots
+	 * @throws IOException
+	 */
+	public void startCountingProcess(LinkedList<Candidate> candidateList, LinkedList<Ballot> ballotList, int totalBallots, int blankBallots, int invalidBallots) throws IOException {
+		
 		Candidate toEliminate;
 		while(candidateList.size() > 1) {
 			if(checkForFifty(candidateList,ballotList)) {
+				writeByFifty(eliminatedList, winner, blankBallots, totalBallots, invalidBallots);
 				break;
 			}
 
@@ -43,50 +58,128 @@ public class CountingProcess {
 				updateEliminate(candidateList, toEliminate, eliminatedList);
 			}
 		}
-		printCandidateList(candidateList);
+		write(eliminatedList, candidateList, blankBallots, totalBallots, invalidBallots);
+		
+	}
+	/**
+	 * The method that writes a new txt file.
+	 * @param eliminatedList
+	 * @param candidateList
+	 * @param blankBallots
+	 * @param totalBallots
+	 * @param invalidBallots
+	 * @throws IOException
+	 */
+	public void write(LinkedList<Candidate> eliminatedList,LinkedList<Candidate> candidateList, int blankBallots, int totalBallots, int invalidBallots) throws IOException {
+		
+		PrintWriter pw = new PrintWriter("result.txt","UTF-8");
+
+		pw.write("Number of Ballots: " + totalBallots);
+		pw.write("\n");
+		pw.write("Number of Blank Ballots: " + blankBallots);
+		pw.write("\n");
+		pw.write("Number of Invalid Ballots :" + invalidBallots);
+		pw.write("\n");
+
+		int roundC = 1;
+		for(Candidate ec : eliminatedList) {
+
+			pw.write("In round " + roundC+ ", " + ec.getCandidateName()+ " was eliminated with " + ec.getAmountOfOnesAtElimination() + " ones.");
+			pw.write("\n");
+			roundC++;	
+		}
+			
+		pw.write("Winner is " + candidateList.get(0).getCandidateName() + " with " + candidateList.get(0).getAmountOf(1) + " that many amount of ones.");
+		pw.close();
+	}
+	
+	/**
+	 * This method writes a new txt file when there is a winner with an advantage of more than fifty percent of ones.
+	 * @param eliminatedList
+	 * @param winner
+	 * @param blankBallots
+	 * @param totalBallots
+	 * @param invalidBallots
+	 * @throws IOException
+	 */
+	public void writeByFifty(LinkedList<Candidate> eliminatedList,Candidate winner, int blankBallots, int totalBallots, int invalidBallots) throws IOException {
+		
+		PrintWriter pw = new PrintWriter("result.txt","UTF-8");
+
+		pw.write("Number of Ballots: " + totalBallots);
+		pw.write("\n");
+		pw.write("Number of Blank Ballots: " + blankBallots);
+		pw.write("\n");
+		pw.write("Number of Invalid Ballots :" + invalidBallots);
+		pw.write("\n");
+
+		int roundC = 1;
+		for(Candidate ec : eliminatedList) {
+
+			pw.write("In round " + roundC+ ", " + ec.getCandidateName()+ " was eliminated with " + ec.getAmountOfOnesAtElimination() + " ones.");
+			pw.write("\n");
+			roundC++;	
+		}
+			
+		pw.write("Winner is " + winner.getCandidateName() + " with " + winner.getAmountOf(1) + " that many amount of ones.");
+		pw.close();
 	}
 
+	/**
+	 *This method is searches and eliminates a candidate from an ballot.
+	 *
+	 * @param candidateList
+	 * @param toEliminate
+	 * @param eliminatedList
+	 */
 	private void updateEliminate(LinkedList<Candidate> candidateList, Candidate toEliminate, LinkedList<Candidate> eliminatedList) {
 		int ballotIDofToEliminateWithOne = 0;
 		toEliminate.setAmountOfOnesAtElimination(toEliminate.getAmountOf(1));
 		for(Regroup r : toEliminate.getVotesReceived()) {
 			if(r.getRank() == 1) {
 				ballotIDofToEliminateWithOne = r.getBallotID();
+				updateEliminateEnhanced(candidateList, ballotIDofToEliminateWithOne, eliminatedList);
+			}
+			break;
+		}
+	}
+	
+	/**
+	 * This method eliminates a candidate but it also tries to update the ballot in base of who was previously eliminated.
+	 * @param candidateList
+	 * @param ballotIDofToEliminateWithOne
+	 * @param eliminatedList
+	 */
+	private void updateEliminateEnhanced(LinkedList<Candidate> candidateList, int ballotIDofToEliminateWithOne, LinkedList<Candidate> eliminatedList) {
 
-				r.setRank(0);
-				for(Candidate c : candidateList) {
-					if(!c.equals(toEliminate)) {
-						for(Regroup r1 : c.getVotesReceived()) {
-							if(r1.getBallotID() == ballotIDofToEliminateWithOne) {
-								r1.setRank(r1.getRank() - 1);
-								break;
-							}
-						}
-					}
-				}
-				if(eliminatedList.size()>1) {
-					updateByEliminatedList(candidateList, ballotIDofToEliminateWithOne, eliminatedList);
-				}
-			}
-		}
-	}
-	private void updateByEliminatedList(LinkedList<Candidate> candidateList, int ballotIDofToEliminateWithOne, LinkedList<Candidate> eliminatedList) {
 		for(Candidate e : eliminatedList) {
-			for(Regroup r1 : e.getVotesReceived()) {
-				if(r1.getBallotID() == ballotIDofToEliminateWithOne) {
-					for(Candidate c : candidateList) {
-						for(Regroup r2 : c.getVotesReceived()) {
-							if(r2.getBallotID() == ballotIDofToEliminateWithOne && r1.getRank() > r2.getRank()) {
-								r2.setRank(r2.getRank() - 1);
+
+			for(Regroup re : e.getVotesReceived()) {
+
+				for(Candidate c : candidateList) {
+
+					for(Regroup r : c.getVotesReceived()) {
+						if(re.equals(r)) {
+							if(re.getRank() < r.getRank()) {
+								r.setRank(r.getRank() - 1);
 								break;
 							}
 						}
 					}
+
 				}
-				r1.setRank(0);
+				re.setRank(0);
 			}
+
 		}
+
 	}
+	/**
+	 * This method check for ties.
+	 * @param candidateList
+	 * @param rank
+	 * @return
+	 */
 	private boolean checkForTies(LinkedList<Candidate> candidateList, int rank) {
 		//Check for ties.
 		for(Candidate c1 : candidateList) {
@@ -186,11 +279,5 @@ public class CountingProcess {
 			}
 		}
 		return candidateList;
-	}
-
-	private void printCandidateList(LinkedList<Candidate> candidateList) {
-		for(Candidate c : candidateList) {
-			System.out.println(c.getCandidateName() + " " + c.getCandidateID() + " " + c.getAmountOf(1));
-		}
 	}
 }

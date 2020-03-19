@@ -2,6 +2,7 @@ package Resources;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Scanner;
 
 import Ballot.Ballot;
@@ -27,11 +28,11 @@ public class FileManager {
 	private LinkedList<Candidate> candidateList;
 	
 	private BallotValidation ballotValidation = new BallotValidation();
-	private CountingProcess countingProcess = new CountingProcess();
 	
-	private int totalBallots = 0;
-	private int totalBlankBallots = 0;
-	private int totalInvalidBallots = 0;
+	
+	public int totalBallots = 0;
+	public int totalBlankBallots = 0;
+	public int totalInvalidBallots = 0;
 	
 	public FileManager() {
 		
@@ -40,8 +41,13 @@ public class FileManager {
 		candidates = new File("res/candidates/candidates.csv");
 		
 	}
-	
-	public void start(File ballotDocument, File candidateDocument) throws FileNotFoundException {
+	/**
+	 * This method starts the building the lists.
+	 * @param ballotDocument
+	 * @param candidateDocument
+	 * @throws IOException
+	 */
+	public void start(File ballotDocument, File candidateDocument) throws IOException {
 		ballotBuilder(ballotDocument);
 		candidateBuilder(candidateDocument);
 		
@@ -50,11 +56,13 @@ public class FileManager {
 		
 		fillCanidateVotesList(ballotList, candidateList);
 		
-		countingProcess.startCountingProcess(getCandidateList(), getBallotList());
-		
 	}
 	
-
+	/**
+	 * This method fills the CastedVotes of every candidate.
+	 * @param ballotList
+	 * @param candidateList
+	 */
 	private void fillCanidateVotesList(LinkedList<Ballot> ballotList, LinkedList<Candidate> candidateList) {
 		
 		Regroup regroup;
@@ -71,7 +79,12 @@ public class FileManager {
 		}
 		
 	}
-
+	
+	/**
+	 * This method builds the ballot list.
+	 * @param ballotDocument
+	 * @throws FileNotFoundException
+	 */
 	private void ballotBuilder(File ballotDocument) throws FileNotFoundException{
 		ballotList = new LinkedList<Ballot>();
 		Scanner sc = new Scanner(ballotDocument);
@@ -90,10 +103,20 @@ public class FileManager {
 		
 		sc.close();
 	}
+	/**
+	 * This method finds the ballot ID.
+	 * @param s
+	 * @return
+	 */
 	private int findBallotID(String s) {
 		Integer toInt = new Integer(s.substring(0, s.indexOf(",")));
 		return toInt.intValue();
 	}
+	/**
+	 * This method builds the casted votes for every ballot.
+	 * @param s
+	 * @return
+	 */
 	private LinkedList<CastedVotes> buildCastedVotesList(String s){
 		LinkedList<CastedVotes> castedVotesList = new LinkedList<CastedVotes>();
 		CastedVotes castedVotes;
@@ -130,6 +153,11 @@ public class FileManager {
 		return castedVotesList;
 	}
 	
+	/**
+	 * This method starts building the candidate list.
+	 * @param candidateDocument
+	 * @throws FileNotFoundException
+	 */
 	private void candidateBuilder(File candidateDocument) throws FileNotFoundException{
 		candidateList = new LinkedList<Candidate>();
 		
@@ -154,44 +182,41 @@ public class FileManager {
 	
 		sc.close();
 	}
-
-	private void printTheListOfVotes(LinkedList<Candidate> list) {
-		for(Candidate c : list) {
-			System.out.println(c.getCandidateName() + " " + c.getCandidateID() + " Received:");
-			for(Regroup r : c.getVotesReceived()) {
-				System.out.println(r.getBallotID() + " " + r.getRank());
-			}
-		}
-	}
-	private void printBallotIDs(LinkedList<Ballot> list) {
-		
-		for(Ballot b : list) {
-			System.out.println(b.getBallotID());
-			printCastedVotes(b.getCastedVotes());
-		}
-	}
-	
-	private void printCastedVotes(LinkedList<CastedVotes> list) {
-		for(CastedVotes cv : list) {
-			System.out.println("ID : " + cv.getCandidateID() + " Rank : " + cv.getRank());
-		}
-	}
 	
 	
 	
-	
+	/**
+	 * This method returns the total ballots in a file.
+	 * @return int
+	 */
 	public int getTotalBallots() {
 		return totalBallots;
 	}
+	/**
+	 * This method returns the amount of blank ballots.
+	 * @return int
+	 */
 	public int getBlankBallots() {
 		return totalBlankBallots;
 	}
+	/**
+	 * This method returns the amount of invalid ballots.
+	 * @return int
+	 */
 	public int getInvalidBallots(){
 		return totalInvalidBallots;
 	}
+	/**
+	 * This method returns the candidate list.
+	 * @return
+	 */
 	public LinkedList<Candidate> getCandidateList(){
 		return candidateList;
 	}
+	/**
+	 * This method returns the ballot list.
+	 * @return
+	 */
 	public LinkedList<Ballot> getBallotList(){
 		return ballotList;
 	}
